@@ -102,17 +102,45 @@ INSERT INTO yzxxw_management.admin_permissions (permission_code_or_path, icon, p
 VALUES ('system:user:point_manage', null, '积分管理', null, 152, 78, 1, 2, 79, DEFAULT, DEFAULT);
 
 
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('register', 0, '注册', '一次性注册 +5 分', 5.0, 1, 1, '2026-03-04 10:20:41', '2026-04-15 17:12:22');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('sign_in', 1, '登录小程序', '每次登陆 + 1 分，每日最多 + 1 分', 1.0, 1, 2, '2026-03-04 10:20:41', '2026-04-14 11:16:55');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('complete_profile', 0, '完善个人信息', '一次性加分 完善真实姓名、头像、出生日期 + 10 分', 10.0, 1, 3, '2026-03-04 10:20:41', '2026-04-14 11:16:55');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('course_learning', 10, '课程超市课程学习', '按学习时长积分。每 3 分钟积 1 分，PDF 文档同理。每日最多 + 10 分。', 1.0, 1, 4, '2026-03-04 10:20:41', '2026-04-14 11:16:55');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('citizen_class_enrollment', 2, '市民课堂报名', '每报名一个市民课堂 +1 分，每日最多 +2 分', 1.0, 1, 5, '2026-04-07 11:06:23', '2026-04-14 11:16:55');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('citizen_class_attendance', 0, '市民课堂签到', '课程签到 +1 分', 1.0, 1, 7, '2026-04-07 11:06:23', '2026-04-14 11:16:55');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('share_course', 3, '分享课程', '课程超市 分享课程给朋友、朋友圈，每日最多 + 3 分', 1.0, 1, 9, '2026-04-07 11:06:23', '2026-04-15 14:01:45');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('recorded_video', 0, '录播视频学习', '学习完成后 + 2 分', 2.0, 1, 11, '2026-04-07 11:06:24', '2026-04-14 11:16:55');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('live_video', 0, '进入直播课堂', '直播课程进入一次 + 1 分，每个课堂只能 + 1 分', 1.0, 1, 12, '2026-04-07 11:06:24', '2026-04-14 11:16:55');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('click', 25, '点击操作', '点击操作 1 次 0.2 分，每天上限 5 分', 0.2, 1, 14, '2026-04-07 11:06:24', '2026-04-14 11:16:55');
-INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, status, sort_order, created_at, updated_at) VALUES ('online_live_event', 10, '线上直播活动', '线上直播活动（不包含常规课程直播课），按学习时长积分，规则和课程超市学习一致', 1.0, 1, 15, '2026-04-07 11:06:24', '2026-04-14 11:16:55');
+ALTER TABLE daily_tasks
+    ADD COLUMN task_type tinyint DEFAULT 2 NOT NULL COMMENT '任务类型：1=一次性任务，2=每日任务，3=无次数限制任务'
+    AFTER reward_points;
+
+
+CREATE TABLE user_point_exchange_record
+(
+    id               bigint AUTO_INCREMENT COMMENT '主键ID' PRIMARY KEY,
+    user_id          bigint                                NOT NULL COMMENT '用户ID',
+    order_no         varchar(500)                          NULL COMMENT '订单编号',
+    goods_id         varchar(500)                          NULL COMMENT '礼品ID',
+    points_cost      decimal(10,1)                         NULL COMMENT '消耗积分',
+    is_deleted       tinyint(1)   DEFAULT 0                NOT NULL COMMENT '是否删除 0=否 1=是',
+    created_at       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL COMMENT '兑换时间',
+    updated_at       datetime     DEFAULT CURRENT_TIMESTAMP NOT NULL ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) COMMENT = '用户积分礼品兑换记录表' CHARSET = utf8mb4;
+
+
+
+
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('register', 0, '注册', '一次性注册 +5 分', 5.0, 1, 1, 1, '2026-03-04 10:20:41', '2026-04-17 12:01:23');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('sign_in', 1, '登录小程序', '每次登陆 + 1 分，每日最多 + 1 分', 1.0, 2, 1, 2, '2026-03-04 10:20:41', '2026-04-14 11:16:55');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('complete_profile', 0, '完善个人信息', '一次性加分 完善真实姓名、头像、出生日期 + 10 分', 10.0, 1, 1, 3, '2026-03-04 10:20:41', '2026-04-17 12:01:23');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('course_learning', 10, '课程超市课程学习', '按学习时长积分。每 3 分钟积 1 分，PDF 文档同理。每日最多 + 10 分。', 1.0, 2, 1, 4, '2026-03-04 10:20:41', '2026-04-14 11:16:55');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('citizen_class_enrollment', 2, '市民课堂报名', '每报名一个市民课堂 +1 分，每日最多 +2 分', 1.0, 2, 1, 5, '2026-04-07 11:06:23', '2026-04-14 11:16:55');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('citizen_class_attendance', 0, '市民课堂签到', '课程签到 +1 分', 1.0, 3, 1, 7, '2026-04-07 11:06:23', '2026-04-17 12:01:23');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('share_course', 3, '分享课程', '课程超市 分享课程给朋友、朋友圈，每日最多 + 3 分', 1.0, 2, 1, 9, '2026-04-07 11:06:23', '2026-04-16 17:37:43');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('recorded_video', 0, '录播视频学习', '学习完成后 + 2 分', 2.0, 3, 1, 11, '2026-04-07 11:06:24', '2026-04-17 12:01:23');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('live_video', 0, '进入直播课堂', '直播课程进入一次 + 1 分，每个课堂只能 + 1 分', 1.0, 3, 1, 12, '2026-04-07 11:06:24', '2026-04-17 12:01:23');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('click', 25, '点击操作', '点击操作 1 次 0.2 分，每天上限 5 分', 0.2, 2, 1, 14, '2026-04-07 11:06:24', '2026-04-14 11:16:55');
+INSERT INTO yzxxw_management.daily_tasks (task_key, daily_max_times, task_content, description, reward_points, task_type, status, sort_order, created_at, updated_at) VALUES ('online_live_event', 10, '线上直播活动', '线上直播活动（不包含常规课程直播课），按学习时长积分，规则和课程超市学习一致', 1.0, 2, 1, 15, '2026-04-07 11:06:24', '2026-04-14 11:16:55');
+
+
+ALTER TABLE surveys
+MODIFY COLUMN reward_points decimal(10,1) DEFAULT 0.0 NOT NULL COMMENT '完成奖励积分';
+
+ALTER TABLE voting_campaigns
+MODIFY COLUMN reward_points decimal(10,1) DEFAULT 0.0 NOT NULL COMMENT '完成奖励积分';
+
 
 COMMIT;
 
